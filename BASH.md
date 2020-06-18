@@ -1,7 +1,6 @@
 ## Overview
 
-
-# Renaming files, even when they have spaces etc
+### Renaming files, even when they have spaces etc
 
 [IFS][0] can be used here to temporarily remove spaces and set it to some place
 holder, and then do the manipulation. So for example, this snippet can be used
