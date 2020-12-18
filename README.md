@@ -5,12 +5,6 @@ what have you, and this allows for a simple way to have the same environment
 going in all places. Thus, this is purely for myself, and if it's helpful to
 someone else I'll be delighted, that's a nice bonus.
 
-A note on that however, speficially for tmux: if you find yourself in a nested
-environment e.g. you run tmux to ssh to multiple cloud vm instances, and in
-those you are running tmux as well (for example, because you don't want code to
-die after you lose the connection), then don't remap Ctrl-B to Ctrl-A, otherwise
-the capture gets confused. Stick with Ctrl-B for the VMs/nested things.
-
 # Expansion
 
 It became obvious to me that I keep Googling how to do the same things:
