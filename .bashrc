@@ -96,6 +96,21 @@ alias l='ls -CF'
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
+# Make pbcopy aliases, warn when xclip is not installed on debian.
+if [[ "$(uname -a)" =~ "Debian" ]]; then
+  if [ ! $(command -v xclip) ]; then
+    echo "Please install xclip, pbcopy will fail until you do.";
+  fi
+  alias pbcopy='xclip -selection clipboard'
+  alias pbpaste='xclip -selection clipboard -o'
+fi
+
+alias ssh-addkey="ssh-add"
+if [[ "$(uname -a)" =~ "Darwin" ]]; then
+  # On MacOS, run this with -K
+  alias ssh-addkey="ssh-add -K"
+fi
+
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
