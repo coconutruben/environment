@@ -14,3 +14,5 @@ for config in ".tmux.conf" ".vimrc"; do
   ln -s $src $dst
 done
 # Expand existing bashrc if it's there to have this sourced, otherwise create it
+
+echo "source ${dir}/.bashrc" >> "${home}/.bashrc"
