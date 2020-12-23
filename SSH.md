@@ -27,6 +27,15 @@ ssh-addkey ~/.ssh/${KEYFNAME}
 
 Run this to make sure all connections attempt to use the key
 
+Debian version
+```
+printf "\nHost *
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/${KEYFNAME}\n" >> ~/.ssh/config
+```
+
+MacOS version
+
 ```
 printf "\nHost *
   AddKeysToAgent yes
