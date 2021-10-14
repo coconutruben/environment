@@ -15,4 +15,8 @@ for config in ".tmux.conf" ".vimrc"; do
 done
 # Expand existing bashrc if it's there to have this sourced, otherwise create it
 
-echo "source ${dir}/.bashrc" >> "${home}/.bashrc"
+if [ -f ${home}/.bashrc.user ]; then
+    echo "source ${dir}/.bashrc" >> "${home}/.bashrc.user"
+else
+    echo "source ${dir}/.bashrc" >> "${home}/.bashrc"
+fi
