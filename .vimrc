@@ -6,8 +6,9 @@ set splitbelow
 set splitright
 
 " These are some code-formatting helpers
-set textwidth=80
+" set textwidth=80
+set colorcolumn=80
 syntax on
 set number
-set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab
+set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 set autoindent
