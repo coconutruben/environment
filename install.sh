@@ -132,11 +132,12 @@ SETTINGS_SRC="$SCRIPT_DIR/claude_settings.json"
 SETTINGS_DST="$HOME_DIR/.claude/settings.json"
 
 if [ -f "$SETTINGS_SRC" ]; then
-    if [ -L "$SETTINGS_DST" ] && [ "$(readlink "$SETTINGS_DST")" = "$SETTINGS_SRC" ]; then
+    REL_SETTINGS="$(python3 -c "import os; print(os.path.relpath('$SETTINGS_SRC', '$(dirname "$SETTINGS_DST")'))")"
+    if [ -L "$SETTINGS_DST" ] && [ "$(readlink "$SETTINGS_DST")" = "$REL_SETTINGS" ]; then
         echo "  settings.json: already linked"
     else
         [ -e "$SETTINGS_DST" ] && mv "$SETTINGS_DST" "${SETTINGS_DST}.old"
-        ln -s "$SETTINGS_SRC" "$SETTINGS_DST"
+        ln -s "$REL_SETTINGS" "$SETTINGS_DST"
         echo "  settings.json: linked"
     fi
 fi
@@ -151,7 +152,8 @@ for skill in "$SCRIPT_DIR"/skills/*/; do
     skill_name=$(basename "$skill")
     target="$SKILL_DIR/$skill_name"
     [ -L "$target" ] && rm "$target"
-    ln -s "$skill" "$target"
+    # Use relative symlinks so they resolve in both host and container contexts
+    ln -s "$(python3 -c "import os; print(os.path.relpath('$skill', '$SKILL_DIR'))")" "$target"
     echo "  skill: $skill_name linked"
 done
 
