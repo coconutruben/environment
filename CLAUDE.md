@@ -9,11 +9,24 @@
   might be needed, suggest it and get confirmation, but DO NOT add random fallbacks just to avoid failure and crashes
   that would obfuscate meaningful failures and crashes
 
+## local vs remote
+
+- if on macOS or hostnames nimoca/icoca, you're on a **local** development machine, not the cluster
+- most things cannot run locally — SSH into the cluster using the SSH aliases (`ssh gb200`, `ssh b200`, etc.)
+
+## worktree-first development
+
+- ALWAYS start work by creating a new worktree. Never work directly on a main branch checkout.
+  ```bash
+  cd ~/work/baeume
+  git worktree add <project>-<feature> <base-branch>
+  ```
+- this ensures the main checkout stays clean and you can't accidentally break an in-progress state
+- worktrees live in ~/work/baeume/. Sync to cluster with `sync_worktree <name> <remote>`.
+
 ## development style
 
-- use git worktrees to develop things by leveraging ~/baeume as the default directory where to plce worktrees for
-  any and all projects
-  
+- use git worktrees in ~/work/baeume/ as the default directory for worktrees for any and all projects
 - prefer to develop in small increments
 - make every step into its own commit
 - make the steps self contained
@@ -28,3 +41,11 @@
 ## tracking
 
 - whenever you notice that you made a mistake or did something wrong that needed modification inside a project, edit the CLAUDE.local.md (or if it doesn't exist yet, create it) for that project, to make sure those mistakes don't happen anymore
+
+## collaborations
+
+When doing collaborative brainstorming or documentation with Claude, save files to `~/claudeandme/`:
+- `~/claudeandme/summaries/` - Summary documents and analysis
+- `~/claudeandme/brainstorming/` - Ideas, exploration, design discussions
+
+Write these as `.md` files.
