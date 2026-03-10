@@ -8,16 +8,18 @@ case $- in
       *) return;;
 esac
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-HISTCONTROL=ignoreboth
-
 # append to the history file, don't overwrite it
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=1000
 HISTFILESIZE=2000
+
+# After each command: append to history file and reload it
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+
+# Avoid duplicate entries and blank lines
+HISTCONTROL=ignoredups:erasedups
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -124,13 +126,31 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
+# =============================================================================
+# Bash Completion Setup
+# =============================================================================
+# See BASH.md for full setup instructions including:
+#   - Installing Homebrew bash on macOS
+#   - Setting up bash-completion
+#   - Installing git completion
+#   - Changing hostname
+
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS with Homebrew bash-completion@2
+    # NOTE: Use hardcoded paths to avoid issues with PATH not being set yet
+    # Requires: brew install bash-completion@2
+    # Requires: curl -o /opt/homebrew/etc/bash_completion.d/git-completion.bash \
+    #           https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
+    export BASH_COMPLETION_COMPAT_DIR="/opt/homebrew/etc/bash_completion.d"
+    [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"
+  else
+    # Linux (Debian/Ubuntu)
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+      . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+      . /etc/bash_completion
+    fi
   fi
 fi
+[ -d "$HOME/scripts" ] && export PATH="$HOME/scripts:$PATH"

@@ -7,7 +7,7 @@ set splitright
 
 " These are some code-formatting helpers
 " set textwidth=80
-set colorcolumn=80
+set colorcolumn=120
 syntax on
 set number
 set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
