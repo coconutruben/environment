@@ -1,20 +1,51 @@
-FROM ubuntu:24.04
+FROM node:20
 
-RUN apt-get update && apt-get install -y \
-    git bash curl openssh-client rsync vim tmux \
-    python3 python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+ARG CLAUDE_CODE_VERSION=latest
 
-# Install Claude Code natively (standalone binary, auto-updates)
-# WORKDIR /tmp is critical — prevents installer from scanning entire fs
-WORKDIR /tmp
-RUN curl -fsSL https://claude.ai/install.sh | bash
+# Development tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    bash \
+    curl \
+    openssh-client \
+    rsync \
+    vim \
+    tmux \
+    python3 \
+    python3-pip \
+    less \
+    procps \
+    fzf \
+    jq \
+    gh \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Match host user UID/GID for file permissions on mounts
-ARG USER_ID=501
-ARG GROUP_ID=20
-RUN groupadd -g $GROUP_ID hostgroup 2>/dev/null || true && \
-    useradd -m -u $USER_ID -g $GROUP_ID claude
-USER claude
-WORKDIR /home/claude
-ENV PATH="/home/claude/.local/bin:$PATH"
+# Create copus user
+RUN useradd -m -s /bin/bash copus
+
+# Persist bash history across container restarts
+RUN mkdir /commandhistory && \
+    touch /commandhistory/.bash_history && \
+    chown -R copus:copus /commandhistory
+ENV HISTFILE=/commandhistory/.bash_history
+ENV PROMPT_COMMAND="history -a"
+
+# Create workspace and config directories
+RUN mkdir -p /workspace /home/copus/.claude && \
+    chown -R copus:copus /workspace /home/copus/.claude
+
+# npm global setup
+RUN mkdir -p /usr/local/share/npm-global && \
+    chown -R copus:copus /usr/local/share/npm-global
+
+USER copus
+WORKDIR /workspace
+
+ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
+ENV PATH=$PATH:/usr/local/share/npm-global/bin
+ENV SHELL=/bin/bash
+ENV EDITOR=vim
+ENV VISUAL=vim
+
+# Install Claude Code via npm
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
