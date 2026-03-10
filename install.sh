@@ -56,7 +56,9 @@ else
     TARGET_RC="$HOME_DIR/.bashrc"
 fi
 
-if [ -f "$TARGET_RC" ] && grep -qF "$SOURCE_LINE" "$TARGET_RC" 2>/dev/null; then
+# Check for both absolute path and ~ version
+TILDE_LINE="source ~/environment/.bashrc"
+if [ -f "$TARGET_RC" ] && (grep -qF "$SOURCE_LINE" "$TARGET_RC" 2>/dev/null || grep -qF "$TILDE_LINE" "$TARGET_RC" 2>/dev/null); then
     echo "  .bashrc: source line already present"
 else
     echo "$SOURCE_LINE" >> "$TARGET_RC"
