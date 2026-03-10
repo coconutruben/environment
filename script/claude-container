@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Build (or rebuild) the image
+echo "Building claude-code-env image..."
+docker build -q -t claude-code-env \
+    --build-arg USER_ID=$(id -u) \
+    --build-arg GROUP_ID=$(id -g) \
+    "$SCRIPT_DIR/docker"
+
+# Run interactively with selective mounts
+exec docker run -it --rm \
+    -v ~/work:/home/claude/work \
+    -v ~/environment:/home/claude/environment:ro \
+    -v ~/environment_bfl:/home/claude/environment_bfl:ro \
+    -v ~/oss:/home/claude/oss:ro \
+    -v ~/claudeandme:/home/claude/claudeandme \
+    -v ~/.claude:/home/claude/.claude \
+    -v ~/.ssh:/home/claude/.ssh:ro \
+    -v ~/.gitconfig:/home/claude/.gitconfig:ro \
+    claude-code-env \
+    claude --dangerously-skip-permissions "$@"
