@@ -30,16 +30,16 @@ RUN mkdir /commandhistory && \
 ENV HISTFILE=/commandhistory/.bash_history
 ENV PROMPT_COMMAND="history -a"
 
-# Create workspace and config directories
-RUN mkdir -p /workspace /home/copus/.claude && \
-    chown -R copus:copus /workspace /home/copus/.claude
+# Create work and config directories
+RUN mkdir -p /home/copus/work /home/copus/.claude && \
+    chown -R copus:copus /home/copus/work /home/copus/.claude
 
 # npm global setup
 RUN mkdir -p /usr/local/share/npm-global && \
     chown -R copus:copus /usr/local/share/npm-global
 
 USER copus
-WORKDIR /workspace
+WORKDIR /home/copus/work
 
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
 ENV PATH=$PATH:/usr/local/share/npm-global/bin

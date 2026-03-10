@@ -8,10 +8,11 @@ echo "Building claude-code-env image..."
 docker build -q -t claude-code-env "$SCRIPT_DIR/docker"
 
 # Run interactively with selective mounts
+# All paths mirror host ~/ so CLAUDE.md instructions work unchanged
 # rw: ~/work, ~/claudeandme, ~/.claude, ~/.claude.json, ~/environment_bfl
 # ro: ~/environment, ~/oss, ~/.ssh, ~/.gitconfig
 exec docker run -it --rm \
-    -v ~/work:/workspace \
+    -v ~/work:/home/copus/work \
     -v ~/environment:/home/copus/environment:ro \
     -v ~/environment_bfl:/home/copus/environment_bfl \
     -v ~/oss:/home/copus/oss:ro \
