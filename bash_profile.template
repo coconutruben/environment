@@ -1,0 +1,21 @@
+# ~/.bash_profile template
+# This is a REFERENCE — install.sh does NOT overwrite ~/.bash_profile.
+# Adapt this to your machine's needs (Homebrew path, conda, etc.)
+
+# Homebrew (macOS)
+# eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Source .bashrc if it exists
+if [ -f ~/.bashrc ]; then
+    source ~/.bashrc
+fi
+
+# Conda initialization (example — adjust path to your install)
+# __conda_setup="$('/path/to/conda' 'shell.bash' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+#     eval "$__conda_setup"
+# fi
+# unset __conda_setup
+
+# Add .local/bin to PATH
+[[ ":$PATH:" == *":$HOME/.local/bin:"* ]] || export PATH="$HOME/.local/bin:$PATH"
