@@ -14,7 +14,11 @@ docker build -q -t claude-code-env "$SCRIPT_DIR/docker"
 # Pass gh token from host keyring so gh CLI works inside container
 export GH_TOKEN=$(gh auth token 2>/dev/null || true)
 
+# Extract Tailscale search domain so short hostnames (gb200-login-1) resolve
+TS_DOMAIN=$(grep -m1 '^search' /etc/resolv.conf 2>/dev/null | awk '{print $2}')
+
 exec docker run -it --rm \
+    ${TS_DOMAIN:+--dns-search "$TS_DOMAIN"} \
     ${GH_TOKEN:+-e GH_TOKEN} \
     -v ~/work:/home/copus/work \
     -v ~/environment:/home/copus/environment:ro \
