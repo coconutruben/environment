@@ -1,57 +1,65 @@
-# Motivation
+# environment
 
-Pretty straight forward stuff: I change laptops frequently, VM instances, and
-what have you, and this allows for a simple way to have the same environment
-going in all places. Thus, this is purely for myself, and if it's helpful to
-someone else I'll be delighted, that's a nice bonus.
+Portable dotfiles and development environment for macOS and Linux.
 
-# Quick Setup
-
-## macOS
+## Quick Setup
 
 ```bash
-# 1. Install Homebrew bash (modern bash 5.x)
-brew install bash
+git clone git@github.com:coconutruben/environment.git ~/environment
+~/environment/install.sh
+```
+
+### What install.sh does
+
+1. Symlinks `.tmux.conf`, `.vimrc` to `~/` (backs up existing)
+2. Symlinks Ghostty config (macOS only)
+3. Adds `source ~/environment/.bashrc` to `~/.bashrc`
+4. Sets up `~/.claude/` (CLAUDE.md, settings.json, rules, skills)
+5. Detects local vs remote machine context
+
+### macOS prerequisites
+
+```bash
+brew install bash bash-completion@2
 echo "/opt/homebrew/bin/bash" | sudo tee -a /etc/shells
 chsh -s /opt/homebrew/bin/bash
-
-# 2. Set up bash completion (including git)
-brew install bash-completion@2
 curl -o /opt/homebrew/etc/bash_completion.d/git-completion.bash \
      https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
-
-# 3. Set your hostname
-sudo scutil --set ComputerName "your-hostname"
-sudo scutil --set LocalHostName "your-hostname"
-sudo scutil --set HostName "your-hostname"
-
-# 4. Copy/symlink config files
-cp .bashrc ~/.bashrc
-cp .vimrc ~/.vimrc
-cp .tmux.conf ~/.tmux.conf
-
-# 5. Make sure ~/.bash_profile sources ~/.bashrc
-echo 'if [ -f ~/.bashrc ]; then source ~/.bashrc; fi' >> ~/.bash_profile
 ```
 
-See [BASH.md](BASH.md) for detailed bash setup and troubleshooting.
+See [BASH.md](BASH.md) for detailed bash setup and hostname configuration.
 
-## Linux
+## Structure
 
-```bash
-./linux_install.sh
+```
+.bashrc                 # Shell config (macOS + Linux)
+.tmux.conf              # tmux (prefix C-a, mouse, vi-mode, Tokyo Night status)
+.vimrc                  # vim (2-space tabs, line numbers, split nav)
+ghostty/config          # Ghostty terminal (macOS only, Tokyo Night)
+bash_profile.template   # Reference template for ~/.bash_profile
+install.sh              # Cross-platform installer
+CLAUDE.md               # Claude Code preferences (base layer)
+claude_settings.json    # Claude Code permissions
+docker/Dockerfile       # Docker image for autonomous Claude Code
+script/                 # Scripts added to PATH
+  claude-container      # Run Claude Code in Docker with skip-permissions
+skills/                 # Claude Code slash commands
+  worktree/             # /worktree — create git worktrees
+  sync/                 # /sync — rsync worktree to cluster
 ```
 
-# Expansion
+## Layering with environment_bfl
 
-It became obvious to me that I keep Googling how to do the same things:
-- iterate over a list in bash
-- use random unix controls properly e.g. cut
-- git pull vs rebase and what --mixed does
+This repo is the base layer. [environment_bfl](https://github.com/coconutruben/environment_bfl) (private) adds BFL-specific overlay:
+- SSH config for cluster login nodes
+- BFL scripts (sync_worktree, fetch_gb200)
+- Project-specific Claude Code rules and skills
 
-So I decided to make myself a few cheat-cheats to make look-up simple, and
-hopefully remember things better as I'm forced to write those cheet-sheets. So
-they'll have general approaches on how to do certain things, and syntax lookup,
-etc. Hopefully those are also helpful to some, though I'd encourage everyone to
-make their own versions to experiment with things and learn the things that
-pertain to their own workflow.
+Run `environment/install.sh` first, then `environment_bfl/install.sh`.
+
+## Cheat sheets
+
+- [BASH.md](BASH.md) — Bash setup, completion, hostname
+- [GIT.md](GIT.md) — Git workflow (rebase-based)
+- [SSH.md](SSH.md) — SSH key setup
+- [REMOTE.md](REMOTE.md) — Headless remote desktop
