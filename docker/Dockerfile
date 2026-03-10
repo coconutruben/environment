@@ -42,7 +42,7 @@ USER copus
 WORKDIR /home/copus/work
 
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
-ENV PATH=$PATH:/usr/local/share/npm-global/bin
+ENV PATH=/home/copus/environment/script:/home/copus/environment_bfl/script:/usr/local/share/npm-global/bin:$PATH
 ENV SHELL=/bin/bash
 ENV EDITOR=vim
 ENV VISUAL=vim
