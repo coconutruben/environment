@@ -11,7 +11,11 @@ docker build -q -t claude-code-env "$SCRIPT_DIR/docker"
 # All paths mirror host ~/ so CLAUDE.md instructions work unchanged
 # rw: ~/work, ~/claudeandme, ~/.claude, ~/.claude.json, ~/environment_bfl
 # ro: ~/environment, ~/oss, ~/.ssh, ~/.gitconfig
+# Pass gh token from host keyring so gh CLI works inside container
+export GH_TOKEN=$(gh auth token 2>/dev/null || true)
+
 exec docker run -it --rm \
+    ${GH_TOKEN:+-e GH_TOKEN} \
     -v ~/work:/home/copus/work \
     -v ~/environment:/home/copus/environment:ro \
     -v ~/environment_bfl:/home/copus/environment_bfl \
