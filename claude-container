@@ -1,0 +1,39 @@
+#!/bin/bash
+set -euo pipefail
+
+# Wrapper that adds --add-dir to work around settings.json additionalDirectories
+# not loading CLAUDE.md (https://github.com/anthropics/claude-code/issues/22583)
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BASE_SCRIPT="$HOME/environment/script/claude-container"
+
+# Build with host user context so container paths match host paths
+echo "Building claude-code-env image..."
+docker build -q -t claude-code-env \
+    --build-arg HOST_USER="$(whoami)" \
+    --build-arg HOST_HOME="$HOME" \
+    --build-arg HOST_UID="$(id -u)" \
+    --build-arg HOST_GID="$(id -g)" \
+    "$HOME/environment/docker"
+
+# Pass gh token from host keyring so gh CLI works inside container
+export GH_TOKEN=$(gh auth token 2>/dev/null || true)
+
+# Extract Tailscale search domain so short hostnames (gb200-login-1) resolve
+TS_DOMAIN=$(grep -m1 '^search' /etc/resolv.conf 2>/dev/null | awk '{print $2}')
+
+exec docker run -it --rm \
+    ${TS_DOMAIN:+--dns-search "$TS_DOMAIN"} \
+    ${GH_TOKEN:+-e GH_TOKEN} \
+    -v ~/work:$HOME/work \
+    -v ~/environment:$HOME/environment:ro \
+    -v ~/environment_bfl:$HOME/environment_bfl \
+    -v ~/oss:$HOME/oss:ro \
+    -v ~/claudeandme:$HOME/claudeandme \
+    -v ~/.claude:$HOME/.claude \
+    -v ~/.claude.json:$HOME/.claude.json \
+    -v ~/.ssh:$HOME/.ssh:ro \
+    -v ~/.gitconfig:$HOME/.gitconfig:ro \
+    -v claude-code-history:/commandhistory \
+    claude-code-env \
+    claude --dangerously-skip-permissions --add-dir "$HOME/environment_bfl" "$@"

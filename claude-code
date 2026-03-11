@@ -1,0 +1,5 @@
+#!/bin/bash
+# On-prem (non-container) alias for claude with --add-dir workaround
+# https://github.com/anthropics/claude-code/issues/22583
+
+exec claude --add-dir "$HOME/environment_bfl" "$@"
