@@ -3,14 +3,15 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Build (or rebuild) the image
+# Build with host user context so container paths match host paths
 echo "Building claude-code-env image..."
-docker build -q -t claude-code-env "$SCRIPT_DIR/docker"
+docker build -q -t claude-code-env \
+    --build-arg HOST_USER="$(whoami)" \
+    --build-arg HOST_HOME="$HOME" \
+    --build-arg HOST_UID="$(id -u)" \
+    --build-arg HOST_GID="$(id -g)" \
+    "$SCRIPT_DIR/docker"
 
-# Run interactively with selective mounts
-# All paths mirror host ~/ so CLAUDE.md instructions work unchanged
-# rw: ~/work, ~/claudeandme, ~/.claude, ~/.claude.json, ~/environment_bfl
-# ro: ~/environment, ~/oss, ~/.ssh, ~/.gitconfig
 # Pass gh token from host keyring so gh CLI works inside container
 export GH_TOKEN=$(gh auth token 2>/dev/null || true)
 
@@ -20,15 +21,15 @@ TS_DOMAIN=$(grep -m1 '^search' /etc/resolv.conf 2>/dev/null | awk '{print $2}')
 exec docker run -it --rm \
     ${TS_DOMAIN:+--dns-search "$TS_DOMAIN"} \
     ${GH_TOKEN:+-e GH_TOKEN} \
-    -v ~/work:/home/copus/work \
-    -v ~/environment:/home/copus/environment:ro \
-    -v ~/environment_bfl:/home/copus/environment_bfl \
-    -v ~/oss:/home/copus/oss:ro \
-    -v ~/claudeandme:/home/copus/claudeandme \
-    -v ~/.claude:/home/copus/.claude \
-    -v ~/.claude.json:/home/copus/.claude.json \
-    -v ~/.ssh:/home/copus/.ssh:ro \
-    -v ~/.gitconfig:/home/copus/.gitconfig:ro \
+    -v ~/work:$HOME/work \
+    -v ~/environment:$HOME/environment:ro \
+    -v ~/environment_bfl:$HOME/environment_bfl \
+    -v ~/oss:$HOME/oss:ro \
+    -v ~/claudeandme:$HOME/claudeandme \
+    -v ~/.claude:$HOME/.claude \
+    -v ~/.claude.json:$HOME/.claude.json \
+    -v ~/.ssh:$HOME/.ssh:ro \
+    -v ~/.gitconfig:$HOME/.gitconfig:ro \
     -v claude-code-history:/commandhistory \
     claude-code-env \
     claude --dangerously-skip-permissions "$@"
