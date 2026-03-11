@@ -70,7 +70,23 @@ fi
 # =============================================================================
 
 mkdir -p "$HOME_DIR/.claude/rules"
-mkdir -p "$HOME_DIR/.claude/skills"
+
+# Skills: symlink ~/.claude/skills -> environment's .claude/skills/
+# This replaces per-skill symlinks — all skills in environment/.claude/skills/ auto-propagate
+SKILLS_LINK="$HOME_DIR/.claude/skills"
+SKILLS_TARGET="../environment/.claude/skills"
+if [ -L "$SKILLS_LINK" ] && [ "$(readlink "$SKILLS_LINK")" = "$SKILLS_TARGET" ]; then
+    echo "  skills: already linked"
+else
+    # Clean up old per-skill symlinks or directory
+    if [ -d "$SKILLS_LINK" ] && [ ! -L "$SKILLS_LINK" ]; then
+        find "$SKILLS_LINK" -maxdepth 1 -type l -delete
+        rmdir "$SKILLS_LINK" 2>/dev/null || true
+    fi
+    [ -L "$SKILLS_LINK" ] && rm "$SKILLS_LINK"
+    ln -s "$SKILLS_TARGET" "$SKILLS_LINK"
+    echo "  skills: linked to $SKILLS_TARGET"
+fi
 
 # =============================================================================
 # 5. Generate ~/.claude/CLAUDE.md (base layer + machine context)
@@ -143,22 +159,7 @@ if [ -f "$SETTINGS_SRC" ]; then
 fi
 
 # =============================================================================
-# 7. Symlink skills
-# =============================================================================
-
-SKILL_DIR="$HOME_DIR/.claude/skills"
-for skill in "$SCRIPT_DIR"/skills/*/; do
-    [ -d "$skill" ] || continue
-    skill_name=$(basename "$skill")
-    target="$SKILL_DIR/$skill_name"
-    [ -L "$target" ] && rm "$target"
-    # Use relative symlinks so they resolve in both host and container contexts
-    ln -s "$(python3 -c "import os; print(os.path.relpath('$skill', '$SKILL_DIR'))")" "$target"
-    echo "  skill: $skill_name linked"
-done
-
-# =============================================================================
-# 8. Note about bash_profile
+# 7. Note about bash_profile
 # =============================================================================
 
 if [ ! -f "$HOME_DIR/.bash_profile" ]; then
