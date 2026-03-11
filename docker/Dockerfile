@@ -42,8 +42,10 @@ USER copus
 WORKDIR /home/copus/work
 
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
-ENV PATH=/home/copus/environment/script:/home/copus/environment_bfl/script:/usr/local/share/npm-global/bin:$PATH
+ENV PATH=/home/copus/.local/bin:/home/copus/environment/script:/home/copus/environment_bfl/script:/usr/local/share/npm-global/bin:$PATH
 ENV SHELL=/bin/bash
+ENV TERM=xterm-256color
+ENV COLORTERM=truecolor
 ENV EDITOR=vim
 ENV VISUAL=vim
 
