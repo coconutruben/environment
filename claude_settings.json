@@ -98,7 +98,11 @@
       "Bash(chmod:-R 777 /*)",
       "Bash(find:/ -delete*)",
       "Bash(find:/* -delete*)"
-    ]
+    ],
+    "additionalDirectories": ["~/environment_bfl"]
   },
-  "model": "opus"
+  "model": "opus",
+  "env": {
+    "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD": "1"
+  }
 }
