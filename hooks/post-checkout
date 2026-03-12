@@ -1,0 +1,19 @@
+#!/bin/bash
+# Global post-checkout hook
+# 1. Set up cococlaude symlinks for the current repo
+# 2. Chain to per-repo post-checkout hook if one exists
+
+# cococlaude: symlink CLAUDE.local.md and .claude/ if project is configured
+TOPLEVEL="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -n "$TOPLEVEL" ]; then
+    "$HOME/environment/script/claude-setup-dotfiles" "$TOPLEVEL" 2>/dev/null || true
+fi
+
+# Chain to per-repo hook (in the repo's own .git/hooks/, not the global hooksPath)
+GIT_COMMON="$(git rev-parse --git-common-dir 2>/dev/null)"
+if [ -n "$GIT_COMMON" ]; then
+    REPO_HOOK="$GIT_COMMON/hooks/post-checkout"
+    if [ -x "$REPO_HOOK" ]; then
+        exec "$REPO_HOOK" "$@"
+    fi
+fi
