@@ -159,7 +159,37 @@ if [ -f "$SETTINGS_SRC" ]; then
 fi
 
 # =============================================================================
-# 7. Note about bash_profile
+# 7. Set up global gitignore (core.excludesFile) and hooks (core.hooksPath)
+# =============================================================================
+
+# Global gitignore
+GITIGNORE_SRC="$SCRIPT_DIR/gitignore_global"
+if [ -f "$GITIGNORE_SRC" ]; then
+    CURRENT="$(git config --global core.excludesFile 2>/dev/null || echo "")"
+    if [ "$CURRENT" = "$GITIGNORE_SRC" ]; then
+        echo "  core.excludesFile: already configured"
+    else
+        [ -n "$CURRENT" ] && echo "  WARNING: overwriting existing core.excludesFile=$CURRENT"
+        git config --global core.excludesFile "$GITIGNORE_SRC"
+        echo "  core.excludesFile: set -> $GITIGNORE_SRC"
+    fi
+fi
+
+# Global hooks path
+HOOKS_SRC="$SCRIPT_DIR/hooks"
+if [ -d "$HOOKS_SRC" ]; then
+    CURRENT="$(git config --global core.hooksPath 2>/dev/null || echo "")"
+    if [ "$CURRENT" = "$HOOKS_SRC" ]; then
+        echo "  core.hooksPath: already configured"
+    else
+        [ -n "$CURRENT" ] && echo "  WARNING: overwriting existing core.hooksPath=$CURRENT"
+        git config --global core.hooksPath "$HOOKS_SRC"
+        echo "  core.hooksPath: set -> $HOOKS_SRC"
+    fi
+fi
+
+# =============================================================================
+# 8. Note about bash_profile
 # =============================================================================
 
 if [ ! -f "$HOME_DIR/.bash_profile" ]; then
