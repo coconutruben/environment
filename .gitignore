@@ -1,1 +1,4 @@
 CLAUDE.local.md
+
+# Override global gitignore — we track .claude/skills/ in this repo
+!.claude/
