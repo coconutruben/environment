@@ -175,17 +175,24 @@ if [ -f "$GITIGNORE_SRC" ]; then
     fi
 fi
 
-# Global hooks path
-HOOKS_SRC="$SCRIPT_DIR/hooks"
-if [ -d "$HOOKS_SRC" ]; then
-    CURRENT="$(git config --global core.hooksPath 2>/dev/null || echo "")"
-    if [ "$CURRENT" = "$HOOKS_SRC" ]; then
-        echo "  core.hooksPath: already configured"
+# Git template directory (provides post-checkout hook for new repos/clones)
+TEMPLATE_SRC="$SCRIPT_DIR/git-template"
+if [ -d "$TEMPLATE_SRC" ]; then
+    CURRENT="$(git config --global init.templateDir 2>/dev/null || echo "")"
+    if [ "$CURRENT" = "$TEMPLATE_SRC" ]; then
+        echo "  init.templateDir: already configured"
     else
-        [ -n "$CURRENT" ] && echo "  WARNING: overwriting existing core.hooksPath=$CURRENT"
-        git config --global core.hooksPath "$HOOKS_SRC"
-        echo "  core.hooksPath: set -> $HOOKS_SRC"
+        [ -n "$CURRENT" ] && echo "  WARNING: overwriting existing init.templateDir=$CURRENT"
+        git config --global init.templateDir "$TEMPLATE_SRC"
+        echo "  init.templateDir: set -> $TEMPLATE_SRC"
     fi
+fi
+
+# Clean up old core.hooksPath if it was set by a previous install
+OLD_HOOKS="$(git config --global core.hooksPath 2>/dev/null || echo "")"
+if [ -n "$OLD_HOOKS" ]; then
+    git config --global --unset core.hooksPath
+    echo "  core.hooksPath: removed (migrated to init.templateDir)"
 fi
 
 # =============================================================================

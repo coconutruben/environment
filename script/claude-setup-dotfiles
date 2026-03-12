@@ -98,3 +98,26 @@ if [ -d "$COCO_PROJECT/.claude" ]; then
         echo "cococlaude: linked $DEST"
     fi
 fi
+
+# Install post-checkout hook in the main repo (idempotent)
+# Only needed for repos that existed before init.templateDir was set
+HOOKS_DIR="$GIT_COMMON/hooks"
+HOOK="$HOOKS_DIR/post-checkout"
+MARKER="# cococlaude"
+
+if [ -f "$HOOK" ] && grep -qF "$MARKER" "$HOOK"; then
+    : # already installed
+else
+    HOOK_SRC="$HOME/environment/git-template/hooks/post-checkout"
+    if [ -f "$HOOK_SRC" ]; then
+        if [ ! -f "$HOOK" ]; then
+            cp "$HOOK_SRC" "$HOOK"
+            chmod +x "$HOOK"
+        else
+            # Append to existing hook
+            printf '\n' >> "$HOOK"
+            cat "$HOOK_SRC" >> "$HOOK"
+        fi
+        echo "cococlaude: installed post-checkout hook at $HOOK"
+    fi
+fi
