@@ -54,3 +54,11 @@ ENV TERM=xterm-256color
 ENV COLORTERM=truecolor
 ENV EDITOR=vim
 ENV VISUAL=vim
+
+# =============================================================================
+# Kube contexts
+# =============================================================================
+# Auto-discover all kubeconfigs in ~/.kube/configs/
+# Added to both .bashrc and .bash_profile so it works in interactive shells
+# AND in Claude Code's bash tool (which initializes from user profile)
+RUN echo 'export KUBECONFIG=$(ls ~/.kube/configs/*.yaml 2>/dev/null | tr '"'"'\n'"'"' '"'"':'"'"')' | tee -a ${HOST_HOME}/.bashrc >> ${HOST_HOME}/.bash_profile

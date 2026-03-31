@@ -22,9 +22,15 @@ export GH_TOKEN=$(gh auth token 2>/dev/null || true)
 # Extract Tailscale search domain so short hostnames (gb200-login-1) resolve
 TS_DOMAIN=$(grep -m1 '^search' /etc/resolv.conf 2>/dev/null | awk '{print $2}')
 
+# Build KUBECONFIG from host kubeconfigs so it's available as a real env var
+# (not just in .bashrc, which Claude Code's bash tool may not fully source)
+KUBECONFIG=$(ls ~/.kube/configs/*.yaml 2>/dev/null | tr '\n' ':')
+export KUBECONFIG="${KUBECONFIG%:}"  # trim trailing colon
+
 exec docker run -it --rm \
     ${TS_DOMAIN:+--dns-search "$TS_DOMAIN"} \
     ${GH_TOKEN:+-e GH_TOKEN} \
+    ${KUBECONFIG:+-e KUBECONFIG} \
     -v ~/work:$HOME/work \
     -v ~/environment:$HOME/environment \
     -v ~/environment_bfl:$HOME/environment_bfl \
