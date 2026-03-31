@@ -8,6 +8,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip less procps fzf jq gh \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Install kubectl
+RUN curl -fsSL "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" \
+    -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
+
 # npm global setup
 RUN mkdir -p /usr/local/share/npm-global && \
     chmod 777 /usr/local/share/npm-global

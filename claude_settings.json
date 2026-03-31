@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(python:*)",
@@ -64,6 +67,7 @@
       "Bash(env:*)",
       "Bash(which:*)",
       "Bash(curl:*)",
+      "Bash(kubectl:*)",
       "Read(~/oss/*)",
       "Bash(ls:~/oss*)",
       "Bash(find:~/oss/*)",
@@ -99,10 +103,10 @@
       "Bash(find:/ -delete*)",
       "Bash(find:/* -delete*)"
     ],
-    "additionalDirectories": ["~/environment_bfl"]
+    "additionalDirectories": [
+      "~/environment_bfl"
+    ]
   },
-  "model": "opus",
-  "env": {
-    "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD": "1"
-  }
+  "model": "opus[1m]",
+  "skipDangerousModePermissionPrompt": true
 }

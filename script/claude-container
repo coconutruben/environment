@@ -26,14 +26,17 @@ exec docker run -it --rm \
     ${TS_DOMAIN:+--dns-search "$TS_DOMAIN"} \
     ${GH_TOKEN:+-e GH_TOKEN} \
     -v ~/work:$HOME/work \
-    -v ~/environment:$HOME/environment:ro \
+    -v ~/environment:$HOME/environment \
     -v ~/environment_bfl:$HOME/environment_bfl \
     -v ~/oss:$HOME/oss:ro \
     -v ~/claudeandme:$HOME/claudeandme \
     -v ~/.claude:$HOME/.claude \
     -v ~/.claude.json:$HOME/.claude.json \
     -v ~/.ssh:$HOME/.ssh:ro \
+    -v ~/.kube:$HOME/.kube:ro \
     -v ~/.gitconfig:$HOME/.gitconfig:ro \
     -v claude-code-history:/commandhistory \
+    -v ~/tmp/claude:/tmp \
+    -v "$TMPDIR:$TMPDIR:ro" \
     claude-code-env \
     claude --dangerously-skip-permissions --add-dir "$HOME/environment_bfl" "$@"

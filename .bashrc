@@ -100,3 +100,8 @@ fi
 
 [ -d "$HOME/environment/script" ] && export PATH="$HOME/environment/script:$PATH"
 [ -d "$HOME/environment_bfl/script" ] && export PATH="$HOME/environment_bfl/script:$PATH"
+
+# =============================================================================
+# Kube contexts
+# =============================================================================
+export KUBECONFIG=$(ls ~/.kube/configs/*.yaml | tr '\n' ':')
