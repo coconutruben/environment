@@ -11,6 +11,7 @@ profile = "autonomous-contained"
 [sandbox_workspace_write]
 network_access = false
 writable_roots = [
+  "/Users/coconutrubenbfl/environment",
   "/Users/coconutrubenbfl/environment_bfl",
   "/Users/coconutrubenbfl/work",
   "/Users/coconutrubenbfl/claudeandme",

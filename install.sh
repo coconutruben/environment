@@ -29,17 +29,27 @@ done
 # 2. Neovim config
 # =============================================================================
 
-nvim_src="$SCRIPT_DIR/nvim/init.vim"
-nvim_dst="$HOME_DIR/.config/nvim/init.vim"
+nvim_src="$SCRIPT_DIR/nvim/init.lua"
+nvim_dst="$HOME_DIR/.config/nvim/init.lua"
 if [ -f "$nvim_src" ]; then
     mkdir -p "$(dirname "$nvim_dst")"
     REL_NVIM="$(python3 -c "import os; print(os.path.relpath('$nvim_src', '$(dirname "$nvim_dst")'))")"
     if [ -L "$nvim_dst" ] && [ "$(readlink "$nvim_dst")" = "$REL_NVIM" ]; then
-        echo "  nvim/init.vim: already linked"
+        echo "  nvim/init.lua: already linked"
     else
         [ -e "$nvim_dst" ] && mv "$nvim_dst" "${nvim_dst}.old"
         ln -s "$REL_NVIM" "$nvim_dst"
-        echo "  nvim/init.vim: linked"
+        echo "  nvim/init.lua: linked"
+    fi
+
+    old_nvim_dst="$HOME_DIR/.config/nvim/init.vim"
+    old_nvim_target="../../environment/nvim/init.vim"
+    if [ -L "$old_nvim_dst" ] && [ "$(readlink "$old_nvim_dst")" = "$old_nvim_target" ]; then
+        rm "$old_nvim_dst"
+        echo "  nvim/init.vim: removed old managed link"
+    elif [ -e "$old_nvim_dst" ]; then
+        mv "$old_nvim_dst" "${old_nvim_dst}.old"
+        echo "  nvim/init.vim: backed up existing to init.vim.old"
     fi
 fi
 

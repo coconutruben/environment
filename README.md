@@ -12,7 +12,7 @@ git clone git@github.com:coconutruben/environment.git ~/environment
 ### What install.sh does
 
 1. Symlinks `.tmux.conf`, `.vimrc` to `~/` (backs up existing)
-2. Symlinks Neovim config to `~/.config/nvim/init.vim`
+2. Symlinks Neovim config to `~/.config/nvim/init.lua`
 3. Symlinks Ghostty config (macOS only)
 4. Adds `source ~/environment/.bashrc` to `~/.bashrc`
 5. Sets up `~/.claude/` (CLAUDE.md, settings.json, rules, skills)
@@ -37,7 +37,7 @@ See [BASH.md](BASH.md) for detailed bash setup and hostname configuration.
 .bashrc                 # Shell config (macOS + Linux)
 .tmux.conf              # tmux (prefix C-a, mouse, vi-mode, Tokyo Night status)
 .vimrc                  # vim (2-space tabs, line numbers, split nav)
-nvim/init.vim           # Neovim shim sourcing .vimrc
+nvim/init.lua           # Neovim Lua IDE entrypoint
 ghostty/config          # Ghostty terminal (macOS only, Tokyo Night)
 bash_profile.template   # Reference template for ~/.bash_profile
 install.sh              # Cross-platform installer
