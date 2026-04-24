@@ -7,6 +7,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BASE_SCRIPT="$HOME/environment/script/claude-container"
 
+mkdir -p /tmp/claude
+
 # Build with host user context so container paths match host paths
 echo "Building claude-code-env image..."
 docker build -q -t claude-code-env \
@@ -18,10 +20,8 @@ docker build -q -t claude-code-env \
 
 # Pass gh token from host keyring so gh CLI works inside container
 export GH_TOKEN=$(gh auth token 2>/dev/null || true)
-
 # Extract Tailscale search domain so short hostnames (gb200-login-1) resolve
 TS_DOMAIN=$(grep -m1 '^search' /etc/resolv.conf 2>/dev/null | awk '{print $2}')
-
 # Build KUBECONFIG from host kubeconfigs so it's available as a real env var
 # (not just in .bashrc, which Claude Code's bash tool may not fully source)
 KUBECONFIG=$(ls ~/.kube/configs/*.yaml 2>/dev/null | tr '\n' ':')
@@ -42,6 +42,7 @@ exec docker run -it --rm \
     -v ~/.kube:$HOME/.kube:ro \
     -v ~/.gitconfig:$HOME/.gitconfig:ro \
     -v claude-code-history:/commandhistory \
+    -v claude-code-local:$HOME/.local \
     -v ~/tmp/claude:/tmp \
     -v "$TMPDIR:$TMPDIR:ro" \
     claude-code-env \

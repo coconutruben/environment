@@ -17,9 +17,6 @@ RUN mkdir -p /usr/local/share/npm-global && \
     chmod 777 /usr/local/share/npm-global
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
 
-# Install Claude Code via npm
-RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
-
 # Persist bash history across container restarts
 RUN mkdir -p /commandhistory && chmod 777 /commandhistory
 ENV HISTFILE=/commandhistory/.bash_history
@@ -38,8 +35,8 @@ RUN groupadd -g ${HOST_GID} hostgroup 2>/dev/null || true && \
     useradd -m -d ${HOST_HOME} -s /bin/bash -u ${HOST_UID} -g ${HOST_GID} ${HOST_USER}
 
 # Create work and config directories
-RUN mkdir -p ${HOST_HOME}/work ${HOST_HOME}/.claude && \
-    chown -R ${HOST_USER}:${HOST_GID} ${HOST_HOME}/work ${HOST_HOME}/.claude
+RUN mkdir -p ${HOST_HOME}/work ${HOST_HOME}/.claude ${HOST_HOME}/.local && \
+    chown -R ${HOST_USER}:${HOST_GID} ${HOST_HOME}/work ${HOST_HOME}/.claude ${HOST_HOME}/.local
 
 # Fix ownership for npm global and history
 RUN chown -R ${HOST_USER}:${HOST_GID} /usr/local/share/npm-global /commandhistory
@@ -62,3 +59,18 @@ ENV VISUAL=vim
 # Added to both .bashrc and .bash_profile so it works in interactive shells
 # AND in Claude Code's bash tool (which initializes from user profile)
 RUN echo 'export KUBECONFIG=$(ls ~/.kube/configs/*.yaml 2>/dev/null | tr '"'"'\n'"'"' '"'"':'"'"')' | tee -a ${HOST_HOME}/.bashrc >> ${HOST_HOME}/.bash_profile
+
+USER root
+RUN cat > /usr/local/bin/claude-bootstrap.sh << 'EOF'
+#!/bin/bash
+set -e
+if [ ! -x "$HOME/.local/bin/claude" ]; then
+  curl -fsSL https://claude.ai/install.sh | bash
+  ln -sf "$HOME/.local/bin/claude" /usr/local/share/npm-global/bin/claude || true
+fi
+exec "$@"
+EOF
+RUN chmod +x /usr/local/bin/claude-bootstrap.sh
+USER ${HOST_USER}
+
+ENTRYPOINT ["/usr/local/bin/claude-bootstrap.sh"]

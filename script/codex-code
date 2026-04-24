@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+
+# Host wrapper for Codex with the BFL overlay available as an extra writable root.
+exec codex --profile autonomous-contained --add-dir "$HOME/environment_bfl" "$@"

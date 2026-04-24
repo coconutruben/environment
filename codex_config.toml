@@ -1,0 +1,46 @@
+# Managed by ~/environment/install.sh.
+
+model = "gpt-5.5"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "cached"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+profile = "autonomous-contained"
+
+[sandbox_workspace_write]
+network_access = false
+writable_roots = [
+  "/Users/coconutrubenbfl/environment_bfl",
+  "/Users/coconutrubenbfl/work",
+  "/Users/coconutrubenbfl/claudeandme",
+]
+
+[shell_environment_policy]
+inherit = "all"
+ignore_default_excludes = false
+exclude = []
+set = {}
+include_only = []
+
+[features]
+codex_hooks = true
+multi_agent = true
+personality = true
+shell_snapshot = true
+shell_tool = true
+unified_exec = true
+
+[profiles.autonomous-contained]
+model = "gpt-5.5"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "cached"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+
+[projects."/Users/coconutrubenbfl"]
+trust_level = "trusted"
+
+[tui.model_availability_nux]
+"gpt-5.5" = 1

@@ -26,7 +26,25 @@ for config in ".tmux.conf" ".vimrc"; do
 done
 
 # =============================================================================
-# 2. Ghostty config (macOS only)
+# 2. Neovim config
+# =============================================================================
+
+nvim_src="$SCRIPT_DIR/nvim/init.vim"
+nvim_dst="$HOME_DIR/.config/nvim/init.vim"
+if [ -f "$nvim_src" ]; then
+    mkdir -p "$(dirname "$nvim_dst")"
+    REL_NVIM="$(python3 -c "import os; print(os.path.relpath('$nvim_src', '$(dirname "$nvim_dst")'))")"
+    if [ -L "$nvim_dst" ] && [ "$(readlink "$nvim_dst")" = "$REL_NVIM" ]; then
+        echo "  nvim/init.vim: already linked"
+    else
+        [ -e "$nvim_dst" ] && mv "$nvim_dst" "${nvim_dst}.old"
+        ln -s "$REL_NVIM" "$nvim_dst"
+        echo "  nvim/init.vim: linked"
+    fi
+fi
+
+# =============================================================================
+# 3. Ghostty config (macOS only)
 # =============================================================================
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -45,7 +63,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 # =============================================================================
-# 3. Set up ~/.bashrc to source environment/.bashrc
+# 4. Set up ~/.bashrc to source environment/.bashrc
 # =============================================================================
 
 SOURCE_LINE="source $SCRIPT_DIR/.bashrc"
@@ -66,7 +84,7 @@ else
 fi
 
 # =============================================================================
-# 4. Set up ~/.claude/ directory
+# 5. Set up ~/.claude/ directory
 # =============================================================================
 
 mkdir -p "$HOME_DIR/.claude/rules"
@@ -89,7 +107,7 @@ else
 fi
 
 # =============================================================================
-# 5. Generate ~/.claude/CLAUDE.md (base layer + machine context)
+# 6. Generate ~/.claude/CLAUDE.md (base layer + machine context)
 # =============================================================================
 
 CLAUDE_MD="$HOME_DIR/.claude/CLAUDE.md"
@@ -141,7 +159,7 @@ esac
 echo "  CLAUDE.md: added machine context ($MACHINE_CONTEXT, $HOSTNAME_VAL)"
 
 # =============================================================================
-# 6. Symlink ~/.claude/settings.json
+# 7. Symlink ~/.claude/settings.json
 # =============================================================================
 
 SETTINGS_SRC="$SCRIPT_DIR/claude_settings.json"
@@ -159,7 +177,50 @@ if [ -f "$SETTINGS_SRC" ]; then
 fi
 
 # =============================================================================
-# 7. Set up global gitignore (core.excludesFile) and hooks (core.hooksPath)
+# 8. Set up ~/.codex/ directory
+# =============================================================================
+
+mkdir -p "$HOME_DIR/.codex"
+
+CODEX_CONFIG_SRC="$SCRIPT_DIR/codex_config.toml"
+CODEX_CONFIG_DST="$HOME_DIR/.codex/config.toml"
+
+if [ -f "$CODEX_CONFIG_SRC" ]; then
+    REL_CODEX_CONFIG="$(python3 -c "import os; print(os.path.relpath('$CODEX_CONFIG_SRC', '$(dirname "$CODEX_CONFIG_DST")'))")"
+    if [ -L "$CODEX_CONFIG_DST" ] && [ "$(readlink "$CODEX_CONFIG_DST")" = "$REL_CODEX_CONFIG" ]; then
+        echo "  codex/config.toml: already linked"
+    else
+        [ -e "$CODEX_CONFIG_DST" ] && mv "$CODEX_CONFIG_DST" "${CODEX_CONFIG_DST}.old"
+        ln -s "$REL_CODEX_CONFIG" "$CODEX_CONFIG_DST"
+        echo "  codex/config.toml: linked"
+    fi
+fi
+
+CODEX_AGENTS="$HOME_DIR/.codex/AGENTS.md"
+
+{
+    echo "<!-- BEGIN environment/AGENTS.md -->"
+    cat "$SCRIPT_DIR/AGENTS.md"
+    echo ""
+    echo "<!-- END environment/AGENTS.md -->"
+    echo ""
+    echo "<!-- BEGIN machine-context -->"
+    echo "## Machine Context"
+    echo ""
+    echo "This machine (**${HOSTNAME_VAL}**) is a **${MACHINE_CONTEXT}** machine."
+    if [ "$MACHINE_CONTEXT" = "local" ]; then
+        echo "This is a macOS development laptop. Most heavy workloads (training, GPU jobs) cannot run here."
+        echo "To run things on the cluster, SSH into the appropriate login node (\`ssh gb200\`, \`ssh b200\`, etc.)."
+    else
+        echo "This is a cluster login node. You can run commands here directly."
+        echo "Use \`srun\`/\`sbatch\` for GPU workloads; the login node is for lightweight tasks, compilation, and job submission."
+    fi
+    echo "<!-- END machine-context -->"
+} > "$CODEX_AGENTS"
+echo "  codex/AGENTS.md: wrote base layer"
+
+# =============================================================================
+# 9. Set up global gitignore (core.excludesFile) and hooks (core.hooksPath)
 # =============================================================================
 
 # Global gitignore
@@ -196,7 +257,7 @@ if [ -n "$OLD_HOOKS" ]; then
 fi
 
 # =============================================================================
-# 8. Note about bash_profile
+# 10. Note about bash_profile
 # =============================================================================
 
 if [ ! -f "$HOME_DIR/.bash_profile" ]; then
