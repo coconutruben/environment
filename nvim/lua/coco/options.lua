@@ -5,6 +5,7 @@ vim.opt.timeoutlen = 1200
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
+vim.opt.clipboard = "unnamedplus"
 
 local extra_paths = {
   vim.fn.stdpath("data") .. "/mason/bin",

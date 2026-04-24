@@ -23,3 +23,4 @@ Neovim additions:
 - `<leader>cf` formats the current buffer manually when a formatter is available.
 - Mason manages LSP servers plus Ruff, Prettier, and Stylua.
 - Telescope live grep requires `ripgrep`; `install.sh` installs it with Homebrew on macOS.
+- Neovim uses the system clipboard by default when a clipboard provider is available.
