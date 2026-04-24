@@ -6,7 +6,14 @@ vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
-local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
-if not vim.env.PATH:find(mason_bin, 1, true) then
-  vim.env.PATH = mason_bin .. ":" .. vim.env.PATH
+local extra_paths = {
+  vim.fn.stdpath("data") .. "/mason/bin",
+  "/opt/homebrew/bin",
+  "/usr/local/bin",
+}
+
+for _, path in ipairs(extra_paths) do
+  if vim.uv.fs_stat(path) and not vim.env.PATH:find(path, 1, true) then
+    vim.env.PATH = path .. ":" .. vim.env.PATH
+  end
 end

@@ -54,7 +54,22 @@ if [ -f "$nvim_src" ]; then
 fi
 
 # =============================================================================
-# 3. Ghostty config (macOS only)
+# 3. Local CLI dependencies
+# =============================================================================
+
+if [[ "$OSTYPE" == "darwin"* ]] && command -v brew >/dev/null 2>&1; then
+    if brew list ripgrep >/dev/null 2>&1; then
+        echo "  ripgrep: already installed"
+    else
+        brew install ripgrep
+        echo "  ripgrep: installed"
+    fi
+elif ! command -v rg >/dev/null 2>&1; then
+    echo "  ripgrep: missing (install rg for Telescope live_grep)"
+fi
+
+# =============================================================================
+# 4. Ghostty config (macOS only)
 # =============================================================================
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -73,7 +88,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 # =============================================================================
-# 4. Set up ~/.bashrc to source environment/.bashrc
+# 5. Set up ~/.bashrc to source environment/.bashrc
 # =============================================================================
 
 SOURCE_LINE="source $SCRIPT_DIR/.bashrc"
@@ -94,7 +109,7 @@ else
 fi
 
 # =============================================================================
-# 5. Set up ~/.claude/ directory
+# 6. Set up ~/.claude/ directory
 # =============================================================================
 
 mkdir -p "$HOME_DIR/.claude/rules"
@@ -117,7 +132,7 @@ else
 fi
 
 # =============================================================================
-# 6. Generate ~/.claude/CLAUDE.md (base layer + machine context)
+# 7. Generate ~/.claude/CLAUDE.md (base layer + machine context)
 # =============================================================================
 
 CLAUDE_MD="$HOME_DIR/.claude/CLAUDE.md"
@@ -169,7 +184,7 @@ esac
 echo "  CLAUDE.md: added machine context ($MACHINE_CONTEXT, $HOSTNAME_VAL)"
 
 # =============================================================================
-# 7. Symlink ~/.claude/settings.json
+# 8. Symlink ~/.claude/settings.json
 # =============================================================================
 
 SETTINGS_SRC="$SCRIPT_DIR/claude_settings.json"
@@ -187,7 +202,7 @@ if [ -f "$SETTINGS_SRC" ]; then
 fi
 
 # =============================================================================
-# 8. Set up ~/.codex/ directory
+# 9. Set up ~/.codex/ directory
 # =============================================================================
 
 mkdir -p "$HOME_DIR/.codex"

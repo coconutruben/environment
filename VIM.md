@@ -22,3 +22,4 @@ Neovim additions:
 - `<leader>aa`, `<leader>ac`, and `<leader>ai` open CodeCompanion actions, chat, and inline edits.
 - `<leader>cf` formats the current buffer manually when a formatter is available.
 - Mason manages LSP servers plus Ruff, Prettier, and Stylua.
+- Telescope live grep requires `ripgrep`; `install.sh` installs it with Homebrew on macOS.
