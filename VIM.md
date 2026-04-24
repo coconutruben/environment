@@ -14,6 +14,7 @@ Current behavior:
 - `autoindent` is enabled.
 
 Neovim additions:
+- `Space` is the leader key. Press `Space` in normal mode to see available mappings.
 - `<leader>ff` finds files, `<leader>fg` greps, `<leader>fb` switches buffers.
 - `gd`, `gr`, `K`, `<leader>rn`, and `<leader>ca` come from LSP when a server is attached.
 - `blink.cmp` provides fast LSP/path/buffer/snippet completion.

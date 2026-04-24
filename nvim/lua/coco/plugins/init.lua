@@ -5,6 +5,14 @@ return {
   },
 
   {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {
+      delay = 300,
+    },
+  },
+
+  {
     "nvim-telescope/telescope.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     cmd = "Telescope",
