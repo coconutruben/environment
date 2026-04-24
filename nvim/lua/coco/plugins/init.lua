@@ -42,6 +42,7 @@ return {
         "prettier",
         "ruff",
         "stylua",
+        "tree-sitter-cli",
       },
       run_on_start = true,
       start_delay = 3000,
@@ -208,7 +209,7 @@ return {
 
       require("nvim-treesitter").setup()
 
-      if #vim.api.nvim_list_uis() > 0 then
+      if #vim.api.nvim_list_uis() > 0 and vim.fn.executable("tree-sitter") == 1 then
         require("nvim-treesitter").install(languages)
       end
 
