@@ -40,8 +40,36 @@ web_search = "cached"
 model_reasoning_effort = "high"
 personality = "pragmatic"
 
+[profiles.handsoff]
+model = "gpt-5.5"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+web_search = "live"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+
+[profiles.handsoff.sandbox_workspace_write]
+network_access = true
+writable_roots = [
+  "/Users/coconutrubenbfl/environment",
+  "/Users/coconutrubenbfl/environment_bfl",
+  "/Users/coconutrubenbfl/work",
+  "/Users/coconutrubenbfl/claudeandme",
+]
+
+[profiles.full-handsoff]
+model = "gpt-5.5"
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+web_search = "live"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+
 [projects."/Users/coconutrubenbfl"]
   trust_level = "trusted"
 
+[projects."/Users/coconutrubenbfl/work"]
+trust_level = "trusted"
+
 [tui.model_availability_nux]
-"gpt-5.5" = 1
+"gpt-5.5" = 2
