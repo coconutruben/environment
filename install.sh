@@ -6,6 +6,37 @@ HOME_DIR="$HOME"
 
 echo "=== Installing environment from $SCRIPT_DIR ==="
 
+link_skill_dir() {
+    local src_dir="$1"
+    local dst_dir="$2"
+    local label="$3"
+
+    [ -d "$src_dir" ] || return 0
+    mkdir -p "$dst_dir"
+
+    for skill in "$src_dir"/*; do
+        [ -d "$skill" ] || continue
+        [ -f "$skill/SKILL.md" ] || continue
+
+        local skill_name
+        local target
+        local rel_skill
+        skill_name="$(basename "$skill")"
+        target="$dst_dir/$skill_name"
+        rel_skill="$(python3 -c "import os, sys; print(os.path.relpath(sys.argv[1], sys.argv[2]))" "$skill" "$dst_dir")"
+
+        if [ -L "$target" ] && [ "$(readlink "$target")" = "$rel_skill" ]; then
+            echo "  $label/$skill_name: already linked"
+        elif [ -e "$target" ] || [ -L "$target" ]; then
+            echo "ERROR: $target already exists and is not managed by this installer" >&2
+            exit 1
+        else
+            ln -s "$rel_skill" "$target"
+            echo "  $label/$skill_name: linked"
+        fi
+    done
+}
+
 # =============================================================================
 # 1. Symlink dotfiles (.tmux.conf, .vimrc)
 # =============================================================================
@@ -57,14 +88,12 @@ fi
 # 3. Local CLI dependencies
 # =============================================================================
 
-if [[ "$OSTYPE" == "darwin"* ]] && command -v brew >/dev/null 2>&1; then
-    if brew list ripgrep >/dev/null 2>&1; then
-        echo "  ripgrep: already installed"
-    else
-        brew install ripgrep
-        echo "  ripgrep: installed"
-    fi
-elif ! command -v rg >/dev/null 2>&1; then
+if command -v rg >/dev/null 2>&1; then
+    echo "  ripgrep: already installed"
+elif [[ "$OSTYPE" == "darwin"* ]] && command -v brew >/dev/null 2>&1; then
+    brew install ripgrep
+    echo "  ripgrep: installed"
+else
     echo "  ripgrep: missing (install rg for Telescope live_grep)"
 fi
 
@@ -114,22 +143,13 @@ fi
 
 mkdir -p "$HOME_DIR/.claude/rules"
 
-# Skills: symlink ~/.claude/skills -> environment's .claude/skills/
-# This replaces per-skill symlinks — all skills in environment/.claude/skills/ auto-propagate
-SKILLS_LINK="$HOME_DIR/.claude/skills"
-SKILLS_TARGET="../environment/.claude/skills"
-if [ -L "$SKILLS_LINK" ] && [ "$(readlink "$SKILLS_LINK")" = "$SKILLS_TARGET" ]; then
-    echo "  skills: already linked"
-else
-    # Clean up old per-skill symlinks or directory
-    if [ -d "$SKILLS_LINK" ] && [ ! -L "$SKILLS_LINK" ]; then
-        find "$SKILLS_LINK" -maxdepth 1 -type l -delete
-        rmdir "$SKILLS_LINK" 2>/dev/null || true
-    fi
-    [ -L "$SKILLS_LINK" ] && rm "$SKILLS_LINK"
-    ln -s "$SKILLS_TARGET" "$SKILLS_LINK"
-    echo "  skills: linked to $SKILLS_TARGET"
+# Skills: keep ~/.claude/skills as a directory of per-skill links so overlay
+# repos can add their own skills without mutating the base environment repo.
+CLAUDE_SKILLS_DIR="$HOME_DIR/.claude/skills"
+if [ -L "$CLAUDE_SKILLS_DIR" ]; then
+    rm "$CLAUDE_SKILLS_DIR"
 fi
+link_skill_dir "$SCRIPT_DIR/.claude/skills" "$CLAUDE_SKILLS_DIR" "claude/skills"
 
 # =============================================================================
 # 7. Generate ~/.claude/CLAUDE.md (base layer + machine context)
@@ -206,6 +226,7 @@ fi
 # =============================================================================
 
 mkdir -p "$HOME_DIR/.codex"
+link_skill_dir "$SCRIPT_DIR/.claude/skills" "$HOME_DIR/.codex/skills" "codex/skills"
 
 CODEX_CONFIG_SRC="$SCRIPT_DIR/codex_config.toml"
 CODEX_CONFIG_DST="$HOME_DIR/.codex/config.toml"
