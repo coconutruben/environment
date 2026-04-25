@@ -1,6 +1,6 @@
 # environment
 
-Portable dotfiles and development environment for macOS and Linux.
+Portable dotfiles and development environment for daily macOS and Linux use.
 
 ## Quick Setup
 
