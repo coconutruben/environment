@@ -6,7 +6,8 @@ COCOCLAUDE="$HOME/cococlaude"
 usage() {
     echo "Usage: claude-setup-dotfiles [--init] <project-path>"
     echo ""
-    echo "Symlink CLAUDE.local.md and .claude/ from ~/cococlaude/ into a project."
+    echo "Symlink local agent files from ~/cococlaude/ into a project."
+    echo "Managed files: CLAUDE.local.md, AGENTS.local.md, .claude/"
     echo ""
     echo "  --init   First-time setup: create cococlaude mirror dir and move"
     echo "           existing files into it before symlinking."
@@ -55,6 +56,16 @@ if $INIT; then
         echo "cococlaude: created empty $COCO_PROJECT/CLAUDE.local.md"
     fi
 
+    # Move AGENTS.local.md if it exists as a real file
+    if [ -f "$TARGET/AGENTS.local.md" ] && [ ! -L "$TARGET/AGENTS.local.md" ]; then
+        mv "$TARGET/AGENTS.local.md" "$COCO_PROJECT/AGENTS.local.md"
+        echo "cococlaude: moved AGENTS.local.md -> $COCO_PROJECT/"
+    elif [ ! -f "$COCO_PROJECT/AGENTS.local.md" ]; then
+        # Create empty AGENTS.local.md
+        touch "$COCO_PROJECT/AGENTS.local.md"
+        echo "cococlaude: created empty $COCO_PROJECT/AGENTS.local.md"
+    fi
+
     # Move .claude/ contents if it exists as a real directory
     if [ -d "$TARGET/.claude" ] && [ ! -L "$TARGET/.claude" ]; then
         # Copy contents preserving structure, then remove original
@@ -71,19 +82,26 @@ fi
 
 # Create symlinks
 
-# CLAUDE.local.md
-if [ -e "$COCO_PROJECT/CLAUDE.local.md" ]; then
-    DEST="$TARGET/CLAUDE.local.md"
-    if [ -L "$DEST" ]; then
+link_local_file() {
+    local name="$1"
+    local src="$COCO_PROJECT/$name"
+    local dest="$TARGET/$name"
+
+    [ -e "$src" ] || return 0
+
+    if [ -L "$dest" ]; then
         : # already a symlink, idempotent
-    elif [ -e "$DEST" ]; then
-        echo "ERROR: $DEST exists and is a real file. Run with --init to migrate, or move it manually." >&2
+    elif [ -e "$dest" ]; then
+        echo "ERROR: $dest exists and is a real file. Run with --init to migrate, or move it manually." >&2
         exit 1
     else
-        ln -s "$COCO_PROJECT/CLAUDE.local.md" "$DEST"
-        echo "cococlaude: linked $DEST"
+        ln -s "$src" "$dest"
+        echo "cococlaude: linked $dest"
     fi
-fi
+}
+
+link_local_file "CLAUDE.local.md"
+link_local_file "AGENTS.local.md"
 
 # .claude/
 if [ -d "$COCO_PROJECT/.claude" ]; then

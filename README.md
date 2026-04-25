@@ -46,7 +46,9 @@ CLAUDE.md               # Claude Code shim importing AGENTS.md
 claude_settings.json    # Claude Code permissions
 codex_config.toml       # Codex CLI defaults
 docker/Dockerfile       # Docker image for autonomous Claude Code
+git-template/           # Git hooks for worktree-local agent symlinks
 script/                 # Scripts added to PATH
+  claude-setup-dotfiles # Symlink CLAUDE.local.md, AGENTS.local.md, .claude/
   claude-container      # Run Claude Code in Docker with skip-permissions
   codex-code            # Run host Codex with BFL overlay available
 skills/                 # Claude Code slash commands

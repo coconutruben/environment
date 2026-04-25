@@ -1,5 +1,5 @@
 #!/bin/bash
-# cococlaude: symlink CLAUDE.local.md and .claude/ if project is configured
+# cococlaude: symlink local agent files if project is configured
 TOPLEVEL="$(git rev-parse --show-toplevel 2>/dev/null)"
 if [ -n "$TOPLEVEL" ]; then
     "$HOME/environment/script/claude-setup-dotfiles" "$TOPLEVEL" 2>/dev/null || true

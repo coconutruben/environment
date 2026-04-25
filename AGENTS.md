@@ -41,6 +41,7 @@
 ## tracking
 
 - whenever you notice that you made a mistake or did something wrong that needed modification inside a project, edit the project-local agent instructions (CLAUDE.local.md, AGENTS.md, or equivalent) so those mistakes don't happen anymore
+- if `AGENTS.local.md` exists in a project, read it at the start of project work; it is symlinked from private local memory and ignored by git
 
 ## collaborations
 
